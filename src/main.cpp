@@ -1,8 +1,11 @@
 #include <iostream>
-#include "process/process.hpp"
+#include <string>
+#include "config/config.hpp"
 
 int main(int argc, char const *argv[]) {
-    ProcessManager process_manager;
-    // process_manager.print();
+    ConfigParser parser("config.txt");
+    Config config = parser.parse();
+    std::string str = config.get("quantum-cycles");
+    std::cout << str;
     return 0;
 }
