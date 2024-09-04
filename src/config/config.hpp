@@ -1,23 +1,24 @@
 #include <fstream>
 #include <string>
+#include <map>
+
+class Config {
+    private:
+        std::map<std::string, std::string> dict;
+
+    public:
+        Config();
+        bool contains(std::string);
+        void add(std::string, std::string);
+        std::string get(std::string);
+};
 
 class ConfigParser {
     private:
-        std::ifstream configFile;
+        std::ifstream config_file;
 
     public:
         ConfigParser(std::string);
         ~ConfigParser();
         Config parse();
-};
-
-class Config {
-    public:
-        const int num_cpu;
-        const std::string scheduler;
-        const int quantum_cycle;
-        const int batch_process_freq;
-        const int min_ins;
-        const int max_ins;
-        Config(int, std::string, int, int, int, int);
 };

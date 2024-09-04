@@ -1,6 +1,6 @@
 # Compiler Information
 CC=g++
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g 
 EXEC=.exe
 
 # Directories
