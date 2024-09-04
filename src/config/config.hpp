@@ -1,3 +1,6 @@
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+
 #include <fstream>
 #include <string>
 #include <map>
@@ -22,3 +25,5 @@ class ConfigParser {
         ~ConfigParser();
         Config parse();
 };
+
+#endif
