@@ -34,7 +34,7 @@ $(BIN): $(OBJECTS)
 	$(CC) $(CFLAGS) $(MAIN_SRC) $? -o $(BIN)
 
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CC) $(CFLAGS) -c $< -o $@
 
