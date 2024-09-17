@@ -93,12 +93,12 @@ void Shell::execute() {
         FMT(0);
         COLOR(RESET_COLOR, RESET_COLOR);
         std::cout << " command is" ;
-        COLOR(DEFAULT_BG, RED_FG);
         FMT(BOLD);
+        COLOR(DEFAULT_BG, RED_FG);
         std::cout << " NOT ";
         FMT(0);
         COLOR(RESET_COLOR, RESET_COLOR);
-        std::cout << "recognized. Doing something." << std::endl << std::endl;
+        std::cout << "recognized. Please try again." << std::endl << std::endl;
 
         return;
     }

@@ -1,12 +1,12 @@
 # Compiler Information
 CC=g++
 CFLAGS=-Wall -g 
-EXEC=.exe
+EXEC=
 
 # Directories
 
 BIN_DIR=bin
-BIN=$(BIN_DIR)/cw$(EXEC)
+BIN=cw$(EXEC)
 
 DOC_DIR=docs
 DOCS=$(wildcard $(docs)/*)
