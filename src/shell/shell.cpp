@@ -5,6 +5,7 @@
 #include <set>
 #include <memory>
 #include "shell.hpp"
+#include "ascii.hpp"
 
 Shell::Shell() {
     commands["clear"] = std::make_unique<ClearCommand>();
@@ -22,32 +23,49 @@ bool Shell::is_running() {
 std::vector<std::string> Shell::accept() {
 
     std::cout << ">> ";
-
-    std::string in;
     std::vector<std::string> tokens;
-
-    std::getline(std::cin, in);
-    std::stringstream ss(in);
-
+    std::string current_word;
     bool has_command = false;
-    std::string word;
+    __args.clear();
 
-    __args = std::vector<std::string>();
-
-    while (ss >> word) {
-        
-        if (!has_command) {
-            command_input = word;
+    char c;
+    while (std::cin.get(c)) {
+        if (c == '\n') {
+            // Process the last word if it's not empty
+            if (!current_word.empty()) {
+                if (!has_command) {
+                    command_input = current_word;
+                    has_command = true;
+                } else {
+                    __args.push_back(current_word);
+                }
+                tokens.push_back(current_word);
+            }
+            break;  // Exit the loop when newline is encountered
+        } else if (std::isspace(c)) {
+            // Process the current word when a space is encountered
+            if (!current_word.empty()) {
+                if (!has_command) {
+                    command_input = current_word;
+                    has_command = true;
+                } else {
+                    __args.push_back(current_word);
+                }
+                tokens.push_back(current_word);
+                current_word.clear();
+            }
         } else {
-            __args.push_back(word);
+            // Add the character to the current word
+            current_word += c;
+            
+            // Here you can add any per-character processing logic
+            // For example:
+            // processCharacter(c);
         }
-
-        tokens.push_back(word);
-
-        has_command = true;
     }
-    
+
     return tokens;
+
 }
 
 void Shell::__print_header() {
