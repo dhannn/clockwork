@@ -4,9 +4,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../process/process.hpp"
+#include <map>
+#include <memory>
+#include "command.hpp"
 #include "../config/config.hpp"
-#include "controller.hpp"
+#include "../cpu/cpu.hpp" 
 
 // ansi escape codes
 // Repurposed from
@@ -51,6 +53,14 @@ enum COLORS{
     DEFAULT_BG
 };
 
+class Command;
+
+enum ShellState {
+    MAIN_MENU, 
+    SCREEN_SINGLE,
+    SCREEN_MULTIPLE
+};
+
 class Shell {
     private:
 
@@ -63,28 +73,32 @@ class Shell {
             " / __| |  / _ \\ / __| |/ /\\ \\    / / _ \\| _ \\ |/ /",
             "| (__| |_| (_) | (__| ' <  \\ \\/\\/ / (_) |   / ' < ",
             " \\___|____\\___/ \\___|_|\\_\\  \\_/\\_/ \\___/|_|_\\_|\\_\\",
-            "a process scheduler emulator by @dhannn",
+            "a process scheduler emulator by Daniel III Ramos",
             ""
         };
 
-        Config config;
+        CPU cpu;
 
-        std::string command;
-        std::vector<std::string> args;
+        Config config;
+        std::map<std::string, std::unique_ptr<Command>> commands;
+        std::string command_input;
+        std::vector<std::string> __args;
         void __print_header();
-        Controller controller;
 
 
     public:
         const int MARGIN = 25;
-
         bool __is_running = false;
-        void main();
-        bool is_running();
-        std::vector<std::string> accept();
-        void execute();
+        ShellState state = MAIN_MENU;
+        
         Shell();
-        Shell(CPU);
+        void start();
+        bool is_running();
+        std::vector<std::string> args() { return __args; }
+        std::vector<std::string> accept();
+        void print_process(string name, int current, int total);
+        void print_processes();
+        void execute();
 };
 
 #endif
