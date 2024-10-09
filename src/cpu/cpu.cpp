@@ -14,7 +14,6 @@ void CPU::spawn_process(string name) {
     num_process++;
 }
 
-Process CPU::get_process(string name) {
-    cout << process_table.size();
-    return *process_table.at(name);
+Process* CPU::get_process(string name) {
+    return process_table.at(name).get();
 }

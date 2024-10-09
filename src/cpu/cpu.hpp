@@ -19,7 +19,7 @@ class CPU {
     public:
         void initialize_kernel();
         void spawn_process(string name);
-        Process get_process(string name);
+        Process* get_process(string name);
         vector<Process> get_processes();
 };
 

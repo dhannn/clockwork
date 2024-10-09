@@ -24,3 +24,7 @@ void MainView::render() {
     std::cout << std::endl;
     COLOR(RESET_COLOR, RESET_COLOR);
 }
+
+void SingleProcessView::render() {
+    
+}

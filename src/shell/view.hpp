@@ -13,7 +13,7 @@ public:
     virtual ~View() = default;
     virtual void render() = 0;
     virtual void add_to_buffer(string str) {
-        if (screenbuffer.size() == MAX_HEIGHT) {
+        if ((int) screenbuffer.size() == MAX_HEIGHT) {
             screenbuffer.pop();
         }
 

@@ -8,25 +8,29 @@ void ClearCommand::execute(Shell& shell, CPU& cpu)  {
 
 void ScreenCommand::execute(Shell& shell, CPU& cpu) {
     string opt = shell.args()[0];
-    string arg = shell.args()[1];
+    string arg  = shell.args()[1];
     
     if (opt == "-S") {
         cpu.spawn_process(arg);
-        Process process = cpu.get_process(arg);
+        Process process = *cpu.get_process(arg);
         shell.print_process(
             process.name(), 
+            process.created_at(),
             process.current_line(), 
             process.total_line());
     } else if (opt == "-r") {
         try {
-            Process process = cpu.get_process(arg);
+            Process process = *cpu.get_process(arg);
 
             shell.print_process(
                 process.name(), 
+                process.created_at(),
                 process.current_line(), 
                 process.total_line());
         } catch(const std::exception& e) {
             cerr << "Process " << arg << " cannot be found" << endl << endl;
+            shell.state = MAIN_MENU;
+            return;
         }
     } else {
         

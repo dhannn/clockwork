@@ -10,6 +10,7 @@
 #include "../config/config.hpp"
 #include "../cpu/cpu.hpp" 
 #include "ascii.hpp"
+#include "controller.hpp"
 
 class Command;
 
@@ -36,8 +37,8 @@ class Shell {
         };
 
         CPU cpu;
-
         Config config;
+
         std::map<std::string, std::unique_ptr<Command>> commands;
         std::string command_input;
         std::vector<std::string> __args;
@@ -54,7 +55,7 @@ class Shell {
         bool is_running();
         std::vector<std::string> args() { return __args; }
         std::vector<std::string> accept();
-        void print_process(string name, int current, int total);
+        void print_process(string name, string timestamp, int current, int total);
         void print_processes();
         void execute();
 };
