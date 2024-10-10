@@ -1,4 +1,3 @@
-#include <queue>
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,14 +40,6 @@ class OperatingSystem {
         vector<shared_ptr<Process>> get_processes() const;
 };
 
-class Dispatcher {
-    private:
-
-    public:
-        void preempt(shared_ptr<Core>);
-        void dispatch(shared_ptr<Core>, shared_ptr<Process>);
-};
-
 class Core {
     private:
         shared_ptr<Process> process;
@@ -75,14 +66,3 @@ class SchedulingPolicy {
         virtual shared_ptr<Process> next() const = 0;
 };
 
-class Scheduler {
-    private:
-        queue<shared_ptr<Process>> ready_queue;
-        unique_ptr<SchedulingPolicy> policy;
-        set<shared_ptr<Process>> done;
-        void finish_process(shared_ptr<Process>);
-    
-    public:
-        void add_process(shared_ptr<Process>);
-        shared_ptr<Process> next();
-};
