@@ -43,7 +43,7 @@ void Dispatcher::preempt(shared_ptr<Core> core) {
         throw InvalidCoreProcessException("Core " + to_string(core->get_id()) + " has no process to preempt.");
     }
 
-    core->free();
+    core->release();
 
 }
 
