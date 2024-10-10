@@ -12,25 +12,7 @@ using namespace std;
 
 class Scheduler;
 class Dispatcher;
-
-enum ProcessState {
-    READY,
-    RUNNING,
-    TERMINATED
-};
-
-class Process {
-    private:
-        int pid;
-        string name;
-        int program_counter;
-        int num_instructions;
-        ProcessState state;
-
-    public:
-        void execute();
-        void preempt();
-};
+class Process;
 
 class OperatingSystem {
     private:
