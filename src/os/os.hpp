@@ -1,9 +1,14 @@
+#ifndef OS_HPP
+#define OS_HPP
+
 #include <memory>
 #include <string>
 #include <vector>
 #include <map>
 #include <set>
 #include <thread>
+#include <atomic>
+#include <random>
 
 #include "config/config.hpp"
 
@@ -12,20 +17,36 @@ using namespace std;
 class Scheduler;
 class Dispatcher;
 class Process;
+class CPU;
 
 class OperatingSystem {
     private:
         shared_ptr<Config> config;
         unique_ptr<Scheduler> scheduler;
         unique_ptr<Dispatcher> dispatcher;
-        map<string, Process> process_table;
-        static const int pid_counter = 0;
+        unique_ptr<CPU> cpu;
+        map<string, shared_ptr<Process>> process_table;
+        
+        int num_cores;
+        int batch_process_frequency;
+        int max_ins;
+        int min_ins;
+        int ticks;
 
+        random_device rd;
+        mt19937 gen;
+        uniform_int_distribution<> dist;
+
+        mutex mtx;
+        static atomic<int> pid_counter;
+        static atomic<bool> run_stress_test;
+        atomic<bool> running;
         thread main_thread;
-
         void run();
+        void spawn_processes(int);
 
     public:
+        OperatingSystem(): running(false), ticks(0), gen(rd())  {};
         void bootstrap(shared_ptr<Config>);
         void initialize_kernel();
         void start_services();
@@ -33,36 +54,11 @@ class OperatingSystem {
         void shutdown();
 
         void spawn_process(const string&);
-        void remove_process(const string&); 
-        void spawn_processes(int);
+        void start_stress_test();
+        void stop_stress_test();
 
-        shared_ptr<Process> get_process(string) const;
+        shared_ptr<Process> get_process(string n) const { return process_table.at(n); };
         vector<shared_ptr<Process>> get_processes() const;
 };
 
-class Core {
-    private:
-        shared_ptr<Process> process;
-
-    public:
-        void assign(shared_ptr<Process>);
-        void execute();
-        shared_ptr<Process> free();
-        shared_ptr<Process> get_process();
-        bool is_available();
-};
-
-class CPU {
-    private:
-        vector<shared_ptr<Core>> cores;
-
-    public:
-        void initialize_cores(int);
-        shared_ptr<Core> get_available_core();
-};
-
-class SchedulingPolicy {
-    private:
-        virtual shared_ptr<Process> next() const = 0;
-};
-
+#endif
