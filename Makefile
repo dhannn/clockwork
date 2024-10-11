@@ -1,8 +1,7 @@
 # Compiler Information
 CC=g++
-CFLAGS=-Wall -g 
+CFLAGS= -g -std=c++20
 EXEC=
-
 # Directories
 
 BIN_DIR=bin

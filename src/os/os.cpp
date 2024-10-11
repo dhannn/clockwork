@@ -28,8 +28,9 @@ void OperatingSystem::initialize_kernel() {
     pid_counter = 0;
     run_stress_test = false;
 
-    scheduler = make_unique<Scheduler>();
-    dispatcher = make_unique<Dispatcher>();
+    shared_ptr<SchedulingPolicy> policy = (make_shared<FCFS>());
+    scheduler = make_shared<Scheduler>(policy);
+    dispatcher = make_shared<Dispatcher>();
 
 }
 
@@ -52,12 +53,14 @@ void OperatingSystem::run() {
         shared_ptr<Core> core = cpu->get_available_core();
         
         if (core == nullptr) {
+            ticks = cpu->tick();
             continue;
         }
 
         shared_ptr<Process> process = scheduler->next();
 
         if (process == nullptr) {
+            ticks = cpu->tick();
             continue;
         }
 
@@ -95,10 +98,10 @@ void OperatingSystem::spawn_processes(int num_processes) {
 }
 
 void OperatingSystem::start_stress_test() {
-    
+
     lock_guard<mutex> guard(mtx);
     run_stress_test = true;
-    
+
 }
 
 void OperatingSystem::stop_stress_test() {

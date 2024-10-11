@@ -1,3 +1,6 @@
+#ifndef POLICY_HPP
+#define POLICY_HPP
+
 #include <memory>
 #include <queue>
 
@@ -9,7 +12,9 @@ class SchedulingPolicy {
         virtual ~SchedulingPolicy() = default;
 };
 
-class FCFS: SchedulingPolicy {
+class FCFS: public SchedulingPolicy {
     public:
         std::shared_ptr<Process> next(std::queue<std::shared_ptr<Process>>& ready_queue) const override;
 };
+
+#endif

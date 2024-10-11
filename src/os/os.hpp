@@ -10,7 +10,7 @@
 #include <atomic>
 #include <random>
 
-#include "config/config.hpp"
+#include "../config/config.hpp"
 
 using namespace std;
 
@@ -22,16 +22,16 @@ class CPU;
 class OperatingSystem {
     private:
         shared_ptr<Config> config;
-        unique_ptr<Scheduler> scheduler;
-        unique_ptr<Dispatcher> dispatcher;
-        unique_ptr<CPU> cpu;
+        shared_ptr<Scheduler> scheduler;
+        shared_ptr<Dispatcher> dispatcher;
+        shared_ptr<CPU> cpu;
         map<string, shared_ptr<Process>> process_table;
         
         int num_cores;
         int batch_process_frequency;
         int max_ins;
         int min_ins;
-        int ticks;
+        int ticks = 0;
 
         random_device rd;
         mt19937 gen;
@@ -46,7 +46,7 @@ class OperatingSystem {
         void spawn_processes(int);
 
     public:
-        OperatingSystem(): running(false), ticks(0), gen(rd())  {};
+        OperatingSystem(): running(false), gen(rd()) {};
         void bootstrap(shared_ptr<Config>);
         void initialize_kernel();
         void start_services();
@@ -59,6 +59,7 @@ class OperatingSystem {
 
         shared_ptr<Process> get_process(string n) const { return process_table.at(n); };
         vector<shared_ptr<Process>> get_processes() const;
+        ~OperatingSystem() = default;
 };
 
 #endif
