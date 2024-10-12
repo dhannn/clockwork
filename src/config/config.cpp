@@ -1,9 +1,12 @@
+#include <memory>
 #include <string>
 #include <map>
 #include <set>
 #include <fstream>
 #include <iostream>
 #include "config.hpp"
+
+using namespace std;
 
 Config::Config() {
     std::string keys[] = {
@@ -41,27 +44,32 @@ ConfigParser::ConfigParser(std::string filename) {
     config_file = std::ifstream(filename);
 }
 
-Config ConfigParser::parse() {
+shared_ptr<Config> ConfigParser::parse() {
     std::string str = "";
     std::string prev = "";
     bool is_key = true;
 
-    Config config;
+    shared_ptr<Config> config = make_shared<Config>();
+
+    cout << "Reading config file...\n";
 
     while(config_file >> str) {
 
         if (is_key) {
-            if (!config.contains(str)) {
+
+            cout << "Reading " << str << endl;
+
+            if (!config->contains(str)) {
                 throw std::runtime_error("Invalid key found: " + str);
             }
 
-            if (config.get(str) != "") {
+            if (config->get(str) != "") {
                 throw std::runtime_error("Duplicate key: " + str);
             }
 
             is_key = false;
         } else {
-            config.add(prev, str);
+            config->add(prev, str);
             is_key = true;
         }
 

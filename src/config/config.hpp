@@ -1,6 +1,7 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#include <memory>
 #include <fstream>
 #include <string>
 #include <map>
@@ -23,7 +24,7 @@ class ConfigParser {
     public:
         ConfigParser(std::string);
         ~ConfigParser();
-        Config parse();
+        std::shared_ptr<Config> parse();
 };
 
 #endif

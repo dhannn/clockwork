@@ -1,5 +1,6 @@
 #include <atomic>
 #include <random>
+#include <iostream>
 #include "os.hpp"
 #include "cpu.hpp"
 #include "process_manager.hpp"
@@ -15,13 +16,15 @@ void OperatingSystem::bootstrap(shared_ptr<Config> c) {
     batch_process_frequency = stoi(config->get("batch-process-freq"));
     max_ins = stoi(config->get("max-ins"));
     min_ins = stoi(config->get("min-ins"));
-    
+    delay_per_exec = stoi(config->get("delay-per-exec"));
+
     initialize_kernel();
 
 }
 
 void OperatingSystem::initialize_kernel() {
 
+    cpu = make_shared<CPU>();
     cpu->initialize_cores(num_cores);
     dist = uniform_int_distribution<>(min_ins, max_ins);
 
@@ -40,41 +43,34 @@ void OperatingSystem::start(){
 }
 
 void OperatingSystem::run() {
-
     while (running) {
-        lock_guard<mutex> guard(mtx);  // Use lock_guard for automatic unlocking
+        lock_guard<mutex> guard(mtx);
         
-        if (run_stress_test) {
-            if (ticks % batch_process_frequency == 0) {
-                spawn_processes(10);
-            }
+        // Handle stress test if enabled
+        if (run_stress_test && ticks % batch_process_frequency == 0) {
+            spawn_processes(10);
         }
 
-        shared_ptr<Core> core = cpu->get_available_core();
-        
-        if (core == nullptr) {
-            ticks = cpu->tick();
-            continue;
-        }
-
-        shared_ptr<Process> process = scheduler->next();
-
-        if (process == nullptr) {
-            ticks = cpu->tick();
-            continue;
-        }
-
-        dispatcher->dispatch(core, process);
-        
-        for (shared_ptr<Core> core: cpu->get_cores()) {
+        // First, execute all currently running processes
+        for (const auto& core : cpu->get_cores()) {
             if (!core->is_available()) {
                 core->execute();
             }
         }
 
-        ticks = cpu->tick();
-    }
+        // Then, assign new processes to available cores
+        while (auto available_core = cpu->get_available_core()) {
+            auto next_process = scheduler->next();
+            if (!next_process) {
+                break;  // No more processes to assign
+            }
+            
+            dispatcher->dispatch(available_core, next_process);
+        }
 
+        ticks = cpu->tick();
+        this_thread::sleep_for(chrono::milliseconds(delay_per_exec));
+    }
 }
 
 void OperatingSystem::shutdown() {
@@ -112,12 +108,28 @@ void OperatingSystem::stop_stress_test() {
 }
 
 void OperatingSystem::spawn_process(const string& name) {
+    if (!scheduler) {
+        throw std::runtime_error("Scheduler not initialized");
+    }
     
     lock_guard<mutex> guard(mtx);
     
     pid_counter++;
 
     int instruction_count = dist(gen);
-    process_table[name] = make_shared<Process>(pid_counter, name, instruction_count);
+    shared_ptr<Process> process = make_shared<Process>(pid_counter, name, instruction_count);
+    process_table[name] = process;
+    scheduler->add_process(process);
 
+}
+
+vector<shared_ptr<Process>> OperatingSystem::get_processes() const {
+
+    vector<shared_ptr<Process>> v;
+
+    for (auto const& p: process_table) {
+        v.push_back(p.second);
+    }
+
+    return v;
 }

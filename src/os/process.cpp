@@ -1,3 +1,4 @@
+#include <iostream>
 #include "process.hpp"
 
 using namespace std;
@@ -7,6 +8,10 @@ void Process::execute() {
     if (state == TERMINATED) {
         throw InvalidProcessStateException(
             "Process " + name + "(" + to_string(pid) + ") has terminated and cannot be executed");
+    }
+
+    if (state == READY) {
+        state = RUNNING;
     }
     
     if (state == RUNNING) {

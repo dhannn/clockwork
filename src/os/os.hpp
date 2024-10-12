@@ -31,6 +31,7 @@ class OperatingSystem {
         int batch_process_frequency;
         int max_ins;
         int min_ins;
+        int delay_per_exec;
         int ticks = 0;
 
         random_device rd;
@@ -59,7 +60,6 @@ class OperatingSystem {
 
         shared_ptr<Process> get_process(string n) const { return process_table.at(n); };
         vector<shared_ptr<Process>> get_processes() const;
-        ~OperatingSystem() = default;
 };
 
 #endif

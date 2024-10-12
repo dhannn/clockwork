@@ -1,8 +1,11 @@
 #include <string>
+#include <iostream>
+#include <thread>
 
 #include "cpu.hpp"
 #include "scheduling_policy.hpp"
 #include "process_manager.hpp"
+#include "process.hpp"
 
 using namespace std;
 
@@ -11,7 +14,7 @@ void Scheduler::add_process(shared_ptr<Process> process) {
 }
 
 shared_ptr<Process> Scheduler::next() {
-
+    
     if (!ready_queue.empty()) {
         shared_ptr<Process> next_process = ready_queue.front();
         ready_queue.pop();

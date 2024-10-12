@@ -4,15 +4,11 @@
 #include <chrono>
 #include "config/config.hpp"
 #include "os/os.hpp"
+#include "shell/shell.hpp"
 
 int main(int argc, char const *argv[]) {
-    ConfigParser parser("config.txt");
-    Config config = parser.parse();
+    Shell shell;
+    shell.start();
 
-    OperatingSystem os;
-    os.bootstrap(make_shared<Config>(config));
-    os.start();
-
-    os.shutdown();
     return 0;
 }

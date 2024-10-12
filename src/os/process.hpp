@@ -1,9 +1,12 @@
 #ifndef PROCESS_HPP
 #define PROCESS_HPP
 
+#include <iostream>
+#include <thread>
 #include <string>
 #include <stdexcept>
-
+#include <ctime>
+#include <memory>
 
 enum ProcessState {
     READY,
@@ -24,6 +27,7 @@ class Process {
         int program_counter;
         int num_instructions;
         ProcessState state;
+        std::time_t created_at;
 
     public:
         Process() {};
@@ -33,9 +37,20 @@ class Process {
             program_counter(0),
             num_instructions(num_ins),
             state(READY) {
-
+                created_at = std::time(0);
             };
 
+        int get_id() { return pid; };
+        ProcessState get_state() { return state; }
+        std::string get_name() { return name; };
+        int get_program_counter() { return program_counter; };
+        int get_num_instruction() { return num_instructions; };
+        std::string get_created_at() { 
+            struct tm* timeinfo = std::localtime(&created_at);
+            char buffer[50];
+            strftime(buffer, 50, "%m/%d/%Y %I:%M:%S%p", timeinfo);
+            return std::string(buffer);
+        };
         void execute();
         void preempt();
 };

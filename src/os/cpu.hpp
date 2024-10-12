@@ -43,6 +43,8 @@ class CPU {
         std::vector<std::shared_ptr<Core>> get_cores() { return cores; };
         void initialize_cores(int);
         std::shared_ptr<Core> get_available_core() const;
+        int get_num_available_cores() const;
+        int get_num_cores() const { cores.size(); };
 };
 
 #endif

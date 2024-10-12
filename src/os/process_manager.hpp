@@ -2,11 +2,12 @@
 #include <queue>
 #include <set>
 #include <stdexcept>
+#include <thread>
 
 #include "scheduling_policy.hpp"
+#include "process.hpp"
 
 class Core;
-class Process;
 
 class InvalidCoreProcessException: std::runtime_error {
     public:
@@ -21,10 +22,10 @@ class Scheduler {
         std::set<std::shared_ptr<Process>> done;
 
         void finish_process(std::shared_ptr<Process>);
+        std::mutex mtx;
     
     public:
         Scheduler(std::shared_ptr<SchedulingPolicy> p): policy(p) {
-
         };
 
         void add_process(std::shared_ptr<Process>);
