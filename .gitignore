@@ -4,3 +4,4 @@ obj/
 *.exe
 ignore
 */**/ignore
+*-log.txt

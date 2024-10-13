@@ -8,6 +8,7 @@ Controller::Controller(OperatingSystem& _os, Shell& _shell) : os(_os), shell(_sh
     commands["process-smi"] = std::make_unique<ProcessSMICommand>();
     commands["scheduler-test"] = std::make_unique<SchedulerTestCommand>();
     commands["scheduler-stop"] = std::make_unique<SchedulerStopCommand>();
+    commands["report-util"] = std::make_unique<ReportUtilCommand>();
 }
 
 void Controller::execute_command(

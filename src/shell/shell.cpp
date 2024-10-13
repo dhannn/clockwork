@@ -136,7 +136,7 @@ void Shell::display_error(const std::string& error) {
     COLOR(RED_BG, WHITE_FG);
     cout << "ERROR";
     COLOR(RESET_COLOR, RESET_COLOR);
-    cout << "    " << error << endl << endl;
+    cout << "  " << error << endl << endl;
 }
 
 void Shell::clear_screen() {

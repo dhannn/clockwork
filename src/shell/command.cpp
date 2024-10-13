@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include "command.hpp"
 #include "shell.hpp"
@@ -132,6 +133,88 @@ void SchedulerTestCommand::execute(Shell& shell, OperatingSystem& os, const std:
 void SchedulerStopCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
     shell.display("Stopping stress test...");
     os.stop_stress_test();
+}
+
+struct PCB {
+    string name;
+    string time_created;
+    int num_ins;
+    int max_ins;
+};
+
+void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+
+    vector<string> name;
+    vector<string> time_created;
+    vector<int> core_id;
+    vector<int> num_ins;
+    vector<int> max_ins;
+
+    ofstream file("clockwork-log.txt");
+
+    auto running = os.get_running_processes();
+    for (int i = 0; i < os.get_num_cores(); i++) {
+
+        if (running[i] == nullptr) {
+            continue;
+        }
+
+        Process p = *running[i];
+        name.push_back(p.get_name());
+        time_created.push_back(p.get_created_at());
+        core_id.push_back(i);
+        num_ins.push_back(p.get_program_counter());
+        max_ins.push_back(p.get_num_instruction());
+    }
+    
+    auto finished = os.get_finished_processes();
+
+    for (auto const& p: finished) {
+        name.push_back(p->get_name());
+        time_created.push_back(p->get_created_at());
+        core_id.push_back(-1);
+        num_ins.push_back(p->get_program_counter());
+        max_ins.push_back(p->get_num_instruction());
+    }
+
+    vector<struct PCB> _finished;
+
+    file << endl << "CPU utilization: " << ((os.get_num_cores() - os.get_available_cores() * 1.0) / os.get_num_cores()) * 100 << "%" << endl;
+    file << "Cores Used: " << os.get_num_cores() - os.get_available_cores() << endl;
+    file << "Cores Available: " << os.get_available_cores() << endl;
+    file << endl << "Running processes:" << endl;
+    
+    for (int i = 0; i < name.size(); i++) {
+
+        if (core_id[i] != -1) {
+            file <<
+                name[i] << "\t(" << 
+                time_created[i] << ")\t" 
+                << "Core: " << core_id[i] << "\t" 
+                << num_ins[i] << " / " << max_ins[i] << endl;
+        } else {
+            struct PCB pcb {
+                .name = name[i],
+                .time_created = time_created[i],
+                .num_ins = num_ins[i],
+                .max_ins = max_ins[i]
+            };
+
+            _finished.push_back(pcb);
+        }
+    }
+    
+
+    file << "\nTerminated processes:" << endl;
+    for (PCB pcb: _finished) {
+        file << 
+            pcb.name << "\t(" << 
+            pcb.time_created << ")\t" 
+            << "Finished\t" 
+            << pcb.num_ins << " / " << pcb.max_ins << endl;
+    }
+    
+    file << endl;
 }
 
 void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
