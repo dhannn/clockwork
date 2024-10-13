@@ -7,65 +7,34 @@
 #include "shell.hpp"
 #include "ascii.hpp"
 
-Shell::Shell() {
-    commands["clear"] = std::make_unique<ClearCommand>();
-    commands["screen"] = std::make_unique<ScreenCommand>();
-    commands["exit"] = std::make_unique<ExitCommand>();
-    commands["initialize"] = std::make_unique<InitializeCommand>();
+using namespace std;
 
+Shell::Shell() {
     state = MAIN_MENU;    
 }
 
-bool Shell::is_running() {
-    return __is_running;
-}
+pair<string, vector<string>> Shell::accept() {
 
-std::vector<std::string> Shell::accept() {
+    string input;
+    cout << " >> ";
+    getline(cin, input);
+    istringstream iss(input);
 
-    std::cout << ">> ";
-    std::vector<std::string> tokens;
-    std::string current_word;
-    bool has_command = false;
-    __args.clear();
+    vector<string> tokens;
+    string token;
 
-    char c;
-    while (std::cin.get(c)) {
-        if (c == '\n') {
-            // Process the last word if it's not empty
-            if (!current_word.empty()) {
-                if (!has_command) {
-                    command_input = current_word;
-                    has_command = true;
-                } else {
-                    __args.push_back(current_word);
-                }
-                tokens.push_back(current_word);
-            }
-            break;  // Exit the loop when newline is encountered
-        } else if (std::isspace(c)) {
-            // Process the current word when a space is encountered
-            if (!current_word.empty()) {
-                if (!has_command) {
-                    command_input = current_word;
-                    has_command = true;
-                } else {
-                    __args.push_back(current_word);
-                }
-                tokens.push_back(current_word);
-                current_word.clear();
-            }
-        } else {
-            // Add the character to the current word
-            current_word += c;
-            
-            // Here you can add any per-character processing logic
-            // For example:
-            // processCharacter(c);
-        }
+    while (iss >> token) {
+        tokens.push_back(token);
     }
 
-    return tokens;
+    if (tokens.empty()) {
+        return {"", {}};
+    }
 
+    string command = tokens[0];
+    tokens.erase(tokens.begin());
+
+    return { command, tokens };
 }
 
 void Shell::__print_header() {
@@ -87,30 +56,87 @@ void Shell::start() {
 
     CLEAR();
     __print_header();
+}
 
-    while (__is_running) {
-        accept();
-        execute();
+void Shell::stop() {
+    __is_running = false;
+}
+
+void Shell::display(const std::string& message) {
+    cout << message << endl;
+}
+
+
+void Shell::display_process(const std::string& name, int id, int current_line, int max_lines) {
+    cout << endl << "    Process: " << name << endl;
+    cout << "    ID: " << id << endl << endl;
+    if (current_line < max_lines) {
+        cout << "    Current instruction line: " << current_line << endl;
+        cout << "    Lines of code: " << max_lines << endl << endl;
+    } else {
+        cout << "    Finished!" << endl << endl;
     }
 }
 
-void Shell::print_process(string name, string timestamp, int current, int total) {
-    CLEAR();
-    MOVE(0, 0);
-    std::cout << ">> ";
-    std::cout << command_input << " " << __args[0] << " " << __args[1] << std::endl;
+struct PCB {
+    string name;
+    string time_created;
+    int num_ins;
+    int max_ins;
+};
 
-    std::cout << "\t" << name << "\t\t(" << timestamp << ")" <<"\t\t" << current << " / " << total << std::endl << std::endl;
+void Shell::display_processes(
+    int used_cores,
+    int num_cores,
+    vector<string> name, 
+    vector<string> time_created,
+    vector<int> core_id,
+    vector<int> num_ins, 
+    vector<int> max_ins) {
+        vector<struct PCB> finished;
+    
+    clear_screen();
+
+    cout << "Running processes:" << endl;
+    for (int i = 0; i < name.size(); i++) {
+
+        if (core_id[i] != -1) {
+            cout << 
+                name[i] << "\t(" << 
+                time_created[i] << ")\t" 
+                << "Core: " << core_id[i] << "\t" 
+                << num_ins[i] << " / " << max_ins[i] << endl;
+        } else {
+            struct PCB pcb {
+                .name = name[i],
+                .time_created = time_created[i],
+                .num_ins = num_ins[i],
+                .max_ins = max_ins[i]
+            };
+
+            finished.push_back(pcb);
+        }
+    }
+
+    cout << "Terminated processes:" << endl;
+    for (PCB pcb: finished) {
+        cout << 
+            pcb.name << "\t(" << 
+            pcb.time_created << ")\t" 
+            << "Finished\t" 
+            << pcb.num_ins << " / " << pcb.max_ins << endl;
+    }
 }
 
-void Shell::execute() {
-    // try {
-        commands.at(command_input)->execute(*this, os);
-    // } 
-    // catch(const std::exception& e) {
-    //     std::cerr << "Command " << command_input << " not found" << '\n';
-    // }
-    
+void Shell::display_error(const std::string& error) {
+    cout << "    ";
+    COLOR(RED_BG, WHITE_FG);
+    cout << "ERROR";
+    COLOR(RESET_COLOR, RESET_COLOR);
+    cout << "    " << error << endl << endl;
+}
 
-    return;
+void Shell::clear_screen() {
+    CLEAR();
+    MOVE(0, 0);
 }

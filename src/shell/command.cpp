@@ -7,76 +7,83 @@
 
 using namespace std;
 
-void ClearCommand::execute(Shell& shell, OperatingSystem& OperatingSystem)  {
-    shell.start();
-}
+void ClearCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args)  {
+    shell.clear_screen();
 
-void InitializeCommand::execute(Shell& shell, OperatingSystem& os) {
-    ConfigParser parser("config.txt");
-    shared_ptr<Config> config = parser.parse();
-    cout << "Bootstrapping OS..." << endl;
-
-
-    os.bootstrap(config);
-
-    for (int i = 0; i < 20; i++) {
-        string name = "process" + to_string(i);
-        os.spawn_process(name);
-        this_thread::sleep_for(chrono::milliseconds(500));
-    }
-
-    os.start();
-    
-}
-
-void ScreenCommand::execute(Shell& shell, OperatingSystem& os) {
-    string opt = shell.args()[0];
-    // string arg  = shell.args()[1];
-    
-
-    switch (shell.state) {
-        case MAIN_MENU:
-            
-            if (opt == "-ls") {
-                vector<shared_ptr<Process>> processes = os.get_processes();
-                vector<shared_ptr<Process>> running;
-                vector<shared_ptr<Process>> done;
-                
-                for (auto const& p: processes) {
-                    
-                    if (p->get_state() == TERMINATED) {
-                        done.push_back(p);
-                    } else {
-                        running.push_back(p);
-                    }
-
-                }
-
-                cout << "Running: " << endl;
-
-                for (auto const& p: running) {
-                    cout << "ID: " << p->get_id() << "\tName: " << p->get_name() << "\t" << p->get_created_at() << "\t(" << p->get_program_counter() << " / " << p->get_num_instruction() << ")" << endl; 
-                }
-
-                cout << "Terminated: " << endl;
-
-                for (auto const& p: done) {
-                    cout << "ID: " << p->get_id() << "\tName: " << p->get_name() << "\t" << p->get_created_at() << "\t(" << p->get_program_counter() << " / " << p->get_num_instruction() << ")" << endl; 
-                }
-            }
-
-            break;
-        
-        default:
-            break;
-    }
-}
-
-void ExitCommand::execute(Shell& shell, OperatingSystem& os) {
     if (shell.state == MAIN_MENU) {
-        shell.__is_running = false;
-    } else if (shell.state == SCREEN_SINGLE) {
+        shell.start();
+    } 
+}
+
+void InitializeCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    ConfigParser parser("config.txt");
+    auto config = parser.parse();
+    os.bootstrap(config);
+    os.start();
+}
+
+void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    auto const& opt = args[0];
+
+    if (opt == "-S") {
+        shell.clear_screen();
+        os.spawn_process(args[1]);
+        Process process = *os.get_process(args[1]);
+        shell.display_process(
+            process.get_name(), 
+            process.get_id(),
+            process.get_program_counter(), 
+            process.get_num_instruction());
+
+        shell.current_process = args[1];
+        shell.state = SCREEN_SINGLE;
+    } else if (opt == "-r") {
+        shell.clear_screen();
+        Process process = *os.get_process(args[1]);
+        shell.display_process(
+            process.get_name(), 
+            process.get_id(),
+            process.get_program_counter(), 
+            process.get_num_instruction());
+
+        shell.current_process = args[1];
+        shell.state = SCREEN_SINGLE;
+    } else if (opt == "-ls") {
+        vector<shared_ptr<Process>> processes = os.get_processes();
+        vector<string> names;
+        vector<string> created_at;
+        
+        int available_cores = os.get_available_cores();
+        int num_cores = os.get_num_cores();
+        // shell.display_processes(num_cores - available_cores, num_cores,);
+    } else {
+        shell.display_error("Incorrect usage of screen. Usage: screen [-ls | -S <new-process-name> | -r <old-process-name>]");
+    }
+}
+
+void ProcessSMICommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args)  {
+    if (shell.state != SCREEN_SINGLE) {
+        shell.display_error("Command process-smi cannot be accessed. Please choose a process via screen [-s <process-name> | -r <process-name>] ");
+        return;
+    }
+
+    if (shell.current_process != "") {
+        Process process = *os.get_process(shell.current_process);
+        shell.display_process(
+            process.get_name(), 
+            process.get_id(),
+            process.get_program_counter(), 
+            process.get_num_instruction());
+    } 
+}
+
+void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    if (shell.state == SCREEN_SINGLE || shell.state == SCREEN_MULTIPLE) {
         shell.state = MAIN_MENU;
         shell.start();
+        return;
     }
+
+    os.shutdown();
+    shell.stop();
 }

@@ -8,7 +8,10 @@
 
 int main(int argc, char const *argv[]) {
     Shell shell;
-    shell.start();
+    OperatingSystem os;
+    Controller controller(os, shell);
+
+    controller.run();
 
     return 0;
 }

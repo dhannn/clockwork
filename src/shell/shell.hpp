@@ -36,31 +36,31 @@ class Shell {
             ""
         };
 
-        OperatingSystem os;
-        Config config;
-
-        std::map<std::string, std::unique_ptr<Command>> commands;
-        std::string command_input;
-        std::vector<std::string> __args;
         void __print_header();
-
+        bool __is_running = true;
 
     public:
         const int MARGIN = 25;
-        bool __is_running = false;
         ShellState state = MAIN_MENU;
-        bool config_loaded = false;
-
-        OperatingSystem& get_os() { return os; };
+        std::string current_process = "";
         
         Shell();
         void start();
-        bool is_running();
-        std::vector<std::string> args() { return __args; }
-        std::vector<std::string> accept();
-        void print_process(string name, string timestamp, int current, int total);
-        void print_processes();
-        void execute();
+        bool is_running() { return __is_running; };
+        std::pair<std::string, std::vector<std::string>> accept();
+        void display(const std::string& message);
+        void display_process(const std::string& name, int id, int current_line, int max_lines);
+        void display_processes(
+            int used_cores,
+            int num_cores,
+            std::vector<string> name, 
+            std::vector<string> time_created,
+            std::vector<int> core_id,
+            std::vector<int> num_ins, 
+            std::vector<int> max_ins);
+        void display_error(const std::string& error);
+        void clear_screen();
+        void stop();
 };
 
 #endif

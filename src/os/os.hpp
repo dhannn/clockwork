@@ -11,13 +11,13 @@
 #include <random>
 
 #include "../config/config.hpp"
+#include "cpu.hpp"
 
 using namespace std;
 
 class Scheduler;
 class Dispatcher;
 class Process;
-class CPU;
 
 class OperatingSystem {
     private:
@@ -50,13 +50,15 @@ class OperatingSystem {
         OperatingSystem(): running(false), gen(rd()) {};
         void bootstrap(shared_ptr<Config>);
         void initialize_kernel();
-        void start_services();
         void start();
         void shutdown();
 
         void spawn_process(const string&);
         void start_stress_test();
         void stop_stress_test();
+
+        int get_num_cores() { return cpu->get_num_cores(); };
+        int get_available_cores() { return cpu->get_num_available_cores(); };
 
         shared_ptr<Process> get_process(string n) const { return process_table.at(n); };
         vector<shared_ptr<Process>> get_processes() const;
