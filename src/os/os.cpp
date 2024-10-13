@@ -48,7 +48,7 @@ void OperatingSystem::run() {
         
         // Handle stress test if enabled
         if (run_stress_test && ticks % batch_process_frequency == 0) {
-            spawn_processes(10);
+            spawn_process("p" + to_string(pid_counter + 1));
         }
 
         // First, execute all currently running processes
@@ -132,4 +132,30 @@ vector<shared_ptr<Process>> OperatingSystem::get_processes() const {
     }
 
     return v;
+}
+
+
+vector<shared_ptr<Process>> OperatingSystem::get_finished_processes() const {
+
+    vector<shared_ptr<Process>> processes;
+
+    for (auto const& process: process_table) {
+        if (process.second->get_state() == TERMINATED) {
+            processes.push_back(process.second);
+        }
+    }
+
+    return processes;
+
+}
+
+vector<shared_ptr<Process>> OperatingSystem::get_running_processes() const {
+    vector<shared_ptr<Process>> processes;
+
+    for (auto const& core: cpu->get_cores()) {
+        auto process = core->get_process();
+        processes.push_back(process);
+    }
+
+    return processes;
 }

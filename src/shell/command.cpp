@@ -49,13 +49,47 @@ void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector
         shell.current_process = args[1];
         shell.state = SCREEN_SINGLE;
     } else if (opt == "-ls") {
-        vector<shared_ptr<Process>> processes = os.get_processes();
-        vector<string> names;
-        vector<string> created_at;
         
-        int available_cores = os.get_available_cores();
-        int num_cores = os.get_num_cores();
-        // shell.display_processes(num_cores - available_cores, num_cores,);
+        vector<string> name;
+        vector<string> time_created;
+        vector<int> core_id;
+        vector<int> num_ins;
+        vector<int> max_ins;
+
+        auto running = os.get_running_processes();
+        for (int i = 0; i < os.get_num_cores(); i++) {
+
+            if (running[i] == nullptr) {
+                continue;
+            }
+
+            Process p = *running[i];
+            name.push_back(p.get_name());
+            time_created.push_back(p.get_created_at());
+            core_id.push_back(i);
+            num_ins.push_back(p.get_program_counter());
+            max_ins.push_back(p.get_num_instruction());
+        }
+        
+        auto finished = os.get_finished_processes();
+
+        for (auto const& p: finished) {
+            name.push_back(p->get_name());
+            time_created.push_back(p->get_created_at());
+            core_id.push_back(-1);
+            num_ins.push_back(p->get_program_counter());
+            max_ins.push_back(p->get_num_instruction());
+        }
+
+        shell.display_processes(
+            os.get_num_cores() - os.get_available_cores(),
+            os.get_num_cores(),
+            name,
+            time_created,
+            core_id,
+            num_ins,
+            max_ins
+        );
     } else {
         shell.display_error("Incorrect usage of screen. Usage: screen [-ls | -S <new-process-name> | -r <old-process-name>]");
     }

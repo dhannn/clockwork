@@ -94,14 +94,15 @@ void Shell::display_processes(
     vector<int> num_ins, 
     vector<int> max_ins) {
         vector<struct PCB> finished;
-    
-    clear_screen();
 
-    cout << "Running processes:" << endl;
+    cout << endl << "    CPU utilization: " << ((used_cores * 1.0) / num_cores) * 100 << "%" << endl;
+    cout << "    Cores Used: " << used_cores << endl;
+    cout << "    Cores Available: " << num_cores - used_cores << endl;
+    cout << endl << "    Running processes:" << endl;
     for (int i = 0; i < name.size(); i++) {
 
         if (core_id[i] != -1) {
-            cout << 
+            cout << "    " <<
                 name[i] << "\t(" << 
                 time_created[i] << ")\t" 
                 << "Core: " << core_id[i] << "\t" 
@@ -118,14 +119,16 @@ void Shell::display_processes(
         }
     }
 
-    cout << "Terminated processes:" << endl;
+    cout << "    Terminated processes:" << endl;
     for (PCB pcb: finished) {
-        cout << 
+        cout << "    " <<
             pcb.name << "\t(" << 
             pcb.time_created << ")\t" 
             << "Finished\t" 
             << pcb.num_ins << " / " << pcb.max_ins << endl;
     }
+    
+    cout << endl;
 }
 
 void Shell::display_error(const std::string& error) {

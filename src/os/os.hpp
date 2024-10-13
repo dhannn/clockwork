@@ -62,6 +62,8 @@ class OperatingSystem {
 
         shared_ptr<Process> get_process(string n) const { return process_table.at(n); };
         vector<shared_ptr<Process>> get_processes() const;
+        vector<shared_ptr<Process>> get_running_processes() const;
+        vector<shared_ptr<Process>> get_finished_processes() const;
 };
 
 #endif
