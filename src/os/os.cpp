@@ -44,7 +44,7 @@ void OperatingSystem::start(){
 
 void OperatingSystem::run() {
     while (running) {
-        lock_guard<mutex> guard(mtx);
+        // lock_guard<mutex> guard(mtx);
         
         // Handle stress test if enabled
         if (run_stress_test && ticks % batch_process_frequency == 0) {
@@ -95,14 +95,14 @@ void OperatingSystem::spawn_processes(int num_processes) {
 
 void OperatingSystem::start_stress_test() {
 
-    lock_guard<mutex> guard(mtx);
+    // lock_guard<mutex> guard(mtx);
     run_stress_test = true;
 
 }
 
 void OperatingSystem::stop_stress_test() {
 
-    lock_guard<mutex> guard(mtx);
+    // lock_guard<mutex> guard(mtx);
     run_stress_test = false;
 
 }

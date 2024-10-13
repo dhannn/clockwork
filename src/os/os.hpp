@@ -57,6 +57,9 @@ class OperatingSystem {
         void start_stress_test();
         void stop_stress_test();
 
+        int get_batch_frequency() {
+            return batch_process_frequency;
+        }
         int get_num_cores() { return cpu->get_num_cores(); };
         int get_available_cores() { return cpu->get_num_available_cores(); };
 

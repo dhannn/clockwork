@@ -6,6 +6,8 @@ Controller::Controller(OperatingSystem& _os, Shell& _shell) : os(_os), shell(_sh
     commands["exit"] = std::make_unique<ExitCommand>();
     commands["initialize"] = std::make_unique<InitializeCommand>();
     commands["process-smi"] = std::make_unique<ProcessSMICommand>();
+    commands["scheduler-test"] = std::make_unique<SchedulerTestCommand>();
+    commands["scheduler-stop"] = std::make_unique<SchedulerStopCommand>();
 }
 
 void Controller::execute_command(

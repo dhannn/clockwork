@@ -20,17 +20,27 @@ class ClearCommand:public Command {
         void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
 };
 
-class ProcessSMICommand:public Command {
-    public:
-        void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
-};
-
 class InitializeCommand:public Command {
     public:
         void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
 };
 
 class ScreenCommand:public Command {
+    public:
+        void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
+};
+
+class ProcessSMICommand:public Command {
+    public:
+        void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
+};
+
+class SchedulerTestCommand:public Command {
+    public:
+        void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
+};
+
+class SchedulerStopCommand:public Command {
     public:
         void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
 };

@@ -111,6 +111,15 @@ void ProcessSMICommand::execute(Shell& shell, OperatingSystem& os, const std::ve
     } 
 }
 
+void SchedulerTestCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    shell.display("Spawning process every " + to_string(os.get_batch_frequency()) + " ticks...");
+    os.start_stress_test();
+}
+
+void SchedulerStopCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    os.stop_stress_test();
+}
+
 void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
     if (shell.state == SCREEN_SINGLE || shell.state == SCREEN_MULTIPLE) {
         shell.state = MAIN_MENU;

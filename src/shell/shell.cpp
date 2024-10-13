@@ -63,7 +63,7 @@ void Shell::stop() {
 }
 
 void Shell::display(const std::string& message) {
-    cout << message << endl;
+    cout << "    " << message << endl;
 }
 
 
