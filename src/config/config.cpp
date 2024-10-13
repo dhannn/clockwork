@@ -51,13 +51,9 @@ shared_ptr<Config> ConfigParser::parse() {
 
     shared_ptr<Config> config = make_shared<Config>();
 
-    cout << "Reading config file...\n";
-
     while(config_file >> str) {
 
         if (is_key) {
-
-            cout << "Reading " << str << endl;
 
             if (!config->contains(str)) {
                 throw std::runtime_error("Invalid key found: " + str);

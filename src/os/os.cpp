@@ -83,26 +83,16 @@ void OperatingSystem::shutdown() {
 
 }
 
-void OperatingSystem::spawn_processes(int num_processes) {
-    
-    lock_guard<mutex> guard(mtx);
-    
-    for (int i = 0; i < num_processes; i++) {
-        spawn_process(to_string(pid_counter));
-    }
-
-}
-
 void OperatingSystem::start_stress_test() {
 
-    // lock_guard<mutex> guard(mtx);
+    lock_guard<mutex> guard(mtx);
     run_stress_test = true;
 
 }
 
 void OperatingSystem::stop_stress_test() {
 
-    // lock_guard<mutex> guard(mtx);
+    lock_guard<mutex> guard(mtx);
     run_stress_test = false;
 
 }

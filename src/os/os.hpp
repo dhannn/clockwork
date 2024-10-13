@@ -44,7 +44,7 @@ class OperatingSystem {
         atomic<bool> running;
         thread main_thread;
         void run();
-        void spawn_processes(int);
+        set<shared_ptr<Process>> finished;
 
     public:
         OperatingSystem(): running(false), gen(rd()) {};

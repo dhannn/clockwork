@@ -18,7 +18,9 @@ void ClearCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<
 void InitializeCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
     ConfigParser parser("config.txt");
     auto config = parser.parse();
+    shell.display("Bootstrapping OS...");
     os.bootstrap(config);
+    shell.display("Starting machine...\n");
     os.start();
 }
 
@@ -38,16 +40,27 @@ void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector
         shell.current_process = args[1];
         shell.state = SCREEN_SINGLE;
     } else if (opt == "-r") {
-        shell.clear_screen();
-        Process process = *os.get_process(args[1]);
-        shell.display_process(
-            process.get_name(), 
-            process.get_id(),
-            process.get_program_counter(), 
-            process.get_num_instruction());
+        
+        try {
+            Process process = *os.get_process(args[1]);
+            
+            if (process.get_state() == TERMINATED) {
+                shell.display_error("Process " + process.get_name() + " not found");
+                return;
+            }
 
-        shell.current_process = args[1];
-        shell.state = SCREEN_SINGLE;
+            shell.clear_screen();
+            shell.display_process(
+                process.get_name(), 
+                process.get_id(),
+                process.get_program_counter(), 
+                process.get_num_instruction());
+
+            shell.current_process = args[1];
+            shell.state = SCREEN_SINGLE;
+        } catch(const std::out_of_range& e) {
+            shell.display_error("Process " + args[1] + " cannot be found. Spawn processes by using screen -S <process-name>");
+        }
     } else if (opt == "-ls") {
         
         vector<string> name;
@@ -117,6 +130,7 @@ void SchedulerTestCommand::execute(Shell& shell, OperatingSystem& os, const std:
 }
 
 void SchedulerStopCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    shell.display("Stopping stress test...");
     os.stop_stress_test();
 }
 

@@ -45,6 +45,11 @@ class SchedulerStopCommand:public Command {
         void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
 };
 
+class ReportUtilCommand:public Command {
+    public:
+        void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
+};
+
 class ExitCommand:public Command {
     public:
         void execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) override;
