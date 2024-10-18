@@ -1,6 +1,6 @@
 num-cpu 4
-scheduler "fcfs"
-quantum-cycles 50
+scheduler "rr"
+quantum-cycles 200
 batch-process-freq 5
 min-ins 100
 max-ins 1000

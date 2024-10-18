@@ -16,8 +16,13 @@ Shell::Shell() {
 pair<string, vector<string>> Shell::accept() {
 
     string input;
-    cout << " >> ";
+    cout << endl << " >> ";
+    flush(cout);
+    FMT(BOLD);
+    COLOR(DEFAULT_BG, BLUE_FG);
     getline(cin, input);
+    COLOR(DEFAULT_BG, DEFAULT_FG);
+    FMT(0);
     istringstream iss(input);
 
     vector<string> tokens;
@@ -63,18 +68,49 @@ void Shell::stop() {
 }
 
 void Shell::display(const std::string& message) {
+    FMT(DIM);
     cout << "    " << message << endl;
+    FMT(0);
 }
 
 
 void Shell::display_process(const std::string& name, int id, int current_line, int max_lines) {
-    cout << endl << "    Process: " << name << endl;
-    cout << "    ID: " << id << endl << endl;
+    cout << "    "; 
+    COLOR(YELLOW_BG, WHITE_FG);
+    cout << "Process";
+    COLOR(RESET_COLOR, RESET_COLOR);
+    COLOR(YELLOW_FG, DEFAULT_BG);
+    cout << " " << name << endl;
+    COLOR(RESET_COLOR, RESET_COLOR);
+    cout << "    "; 
+    COLOR(YELLOW_BG, WHITE_FG);
+    cout << "ID";
+    COLOR(RESET_COLOR, RESET_COLOR);
+    COLOR(YELLOW_FG, DEFAULT_BG);
+    cout << " " << id << endl << endl;
+    COLOR(RESET_COLOR, RESET_COLOR);
     if (current_line < max_lines) {
-        cout << "    Current instruction line: " << current_line << endl;
-        cout << "    Lines of code: " << max_lines << endl << endl;
+        cout << "    Current instruction line: "; 
+
+        double completion_rate = double(current_line) / max_lines ;
+        if (completion_rate <= 0.2) {
+            COLOR(RED_FG, DEFAULT_BG);
+        } else if (completion_rate <= 0.6) {
+            COLOR(YELLOW_FG, DEFAULT_BG);
+        } else if (completion_rate <= 0.8) {
+            COLOR(BLUE_FG, DEFAULT_BG);
+        } else {
+            COLOR(GREEN_FG, DEFAULT_BG);
+        }
+        cout << current_line << endl;
+        COLOR(RESET_COLOR, RESET_COLOR);
+        cout << "    Lines of code: " << max_lines << endl;
     } else {
-        cout << "    Finished!" << endl << endl;
+        COLOR(GREEN_FG, GREEN_BG);
+        FMT(BOLD);
+        cout << "    Finished!";
+        FMT(0);
+        cout << endl;
     }
 }
 
@@ -94,19 +130,25 @@ void Shell::display_processes(
     vector<int> num_ins, 
     vector<int> max_ins) {
         vector<struct PCB> finished;
-
+    
     cout << endl << "    CPU utilization: " << ((used_cores * 1.0) / num_cores) * 100 << "%" << endl;
     cout << "    Cores Used: " << used_cores << endl;
     cout << "    Cores Available: " << num_cores - used_cores << endl;
-    cout << endl << "    Running processes:" << endl;
+    cout << endl << "    --------------------------------------------------------------------------------" << endl;
+    cout << "    Running processes:" << endl;
+
+
     for (int i = 0; i < name.size(); i++) {
 
         if (core_id[i] != -1) {
-            cout << "    " <<
-                name[i] << "\t(" << 
-                time_created[i] << ")\t" 
-                << "Core: " << core_id[i] << "\t" 
-                << num_ins[i] << " / " << max_ins[i] << endl;
+            string _n = name[i];
+
+            if (_n.length() > 15) {
+                _n = _n.substr(0, 12).append("...");
+            }
+
+            printf("    %-15s  (%s)  Core: %d  %8d / %-8d\n", 
+                _n.c_str(), time_created[i].c_str(), core_id[i], num_ins[i], max_ins[i]);
         } else {
             struct PCB pcb {
                 .name = name[i],
@@ -119,16 +161,19 @@ void Shell::display_processes(
         }
     }
 
-    cout << "    Terminated processes:" << endl;
+    cout << endl << "    Finished processes:" << endl;
     for (PCB pcb: finished) {
-        cout << "    " <<
-            pcb.name << "\t(" << 
-            pcb.time_created << ")\t" 
-            << "Finished\t" 
-            << pcb.num_ins << " / " << pcb.max_ins << endl;
+        
+        string _n = pcb.name;
+
+        if (_n.length() > 15) {
+            _n = _n.substr(0, 12).append("...");
+        }
+            printf("    %-15s (%s)  Finished  %8d / %-8d\n", 
+                _n.c_str(), pcb.time_created.c_str(), pcb.num_ins, pcb.max_ins);
     }
-    
-    cout << endl;
+
+    cout << endl << "    --------------------------------------------------------------------------------" << endl;
 }
 
 void Shell::display_error(const std::string& error) {
@@ -136,7 +181,7 @@ void Shell::display_error(const std::string& error) {
     COLOR(RED_BG, WHITE_FG);
     cout << "ERROR";
     COLOR(RESET_COLOR, RESET_COLOR);
-    cout << "  " << error << endl << endl;
+    cout << "  " << error << endl;
 }
 
 void Shell::clear_screen() {

@@ -21,7 +21,7 @@ void InitializeCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
     auto config = parser.parse();
     shell.display("Bootstrapping OS...");
     os.bootstrap(config);
-    shell.display("Starting machine...\n");
+    shell.display("Starting machine...");
     os.start();
 }
 
@@ -60,7 +60,7 @@ void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector
             shell.current_process = args[1];
             shell.state = SCREEN_SINGLE;
         } catch(const std::out_of_range& e) {
-            shell.display_error("Process " + args[1] + " cannot be found. Spawn processes by using screen -S <process-name>");
+            shell.display_error("Process " + args[1] + " not found. Spawn processes by using screen -S <process-name>");
         }
     } else if (opt == "-ls") {
         
@@ -187,11 +187,18 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
     for (int i = 0; i < name.size(); i++) {
 
         if (core_id[i] != -1) {
-            file <<
-                name[i] << "\t(" << 
-                time_created[i] << ")\t" 
-                << "Core: " << core_id[i] << "\t" 
-                << num_ins[i] << " / " << max_ins[i] << endl;
+                
+                string _n = name[i];
+                char buff[100] = "";
+
+                if (_n.length() > 15) {
+                    _n = _n.substr(0, 12).append("...");
+                }
+
+                sprintf(buff, "%-15s  (%s)  Core: %d  %8d / %-8d\n", 
+                    _n.c_str(), time_created[i].c_str(), core_id[i], num_ins[i], max_ins[i]);
+
+                file << buff;
         } else {
             struct PCB pcb {
                 .name = name[i],
@@ -207,11 +214,19 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
 
     file << "\nTerminated processes:" << endl;
     for (PCB pcb: _finished) {
-        file << 
-            pcb.name << "\t(" << 
-            pcb.time_created << ")\t" 
-            << "Finished\t" 
-            << pcb.num_ins << " / " << pcb.max_ins << endl;
+        
+        string _n = pcb.name;
+
+        if (_n.length() > 15) {
+            _n = _n.substr(0, 12).append("...");
+        }
+
+        char buff[100] = "";
+
+        sprintf(buff, "%-15s (%s)  Finished  %8d / %-8d\n", 
+            _n.c_str(), pcb.time_created.c_str(), pcb.num_ins, pcb.max_ins);
+
+        file << buff;
     }
     
     file << endl;
