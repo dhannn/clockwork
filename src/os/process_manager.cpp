@@ -14,16 +14,7 @@ void Scheduler::add_process(shared_ptr<Process> process) {
 }
 
 shared_ptr<Process> Scheduler::next() {
-    
-    if (!ready_queue.empty()) {
-        shared_ptr<Process> next_process = ready_queue.front();
-        ready_queue.pop();
-        
-        return next_process;
-    }
-
-    return nullptr;
-
+    return policy->next(cpu, ready_queue);
 }
 
 void Dispatcher::dispatch(shared_ptr<Core> core, shared_ptr<Process> process) {
@@ -46,7 +37,7 @@ void Dispatcher::preempt(shared_ptr<Core> core) {
         throw InvalidCoreProcessException("Core " + to_string(core->get_id()) + " has no process to preempt.");
     }
 
+    core->get_process()->preempt();
     core->release();
-
 }
 

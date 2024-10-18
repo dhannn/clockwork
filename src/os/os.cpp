@@ -4,6 +4,7 @@
 #include "os.hpp"
 #include "cpu.hpp"
 #include "process_manager.hpp"
+#include "scheduling_policy.hpp"
 #include "process.hpp"
 
 atomic<int> OperatingSystem::pid_counter;
@@ -17,9 +18,19 @@ void OperatingSystem::bootstrap(shared_ptr<Config> c) {
     max_ins = stoi(config->get("max-ins"));
     min_ins = stoi(config->get("min-ins"));
     delay_per_exec = stoi(config->get("delay-per-exec"));
+    scheduler_type = config->get("scheduler");
+    quantum_cycles = stoi(config->get("quantum-cycles"));
 
     initialize_kernel();
 
+}
+
+void OperatingSystem::initialize_scheduler(string scheduler) {
+    map<string, shared_ptr<SchedulingPolicy>> scheduling_policies;
+    scheduling_policies["\"fcfs\""] = make_shared<FCFS>();
+    scheduling_policies["\"rr\""] = make_shared<RoundRobinPolicy>(quantum_cycles);
+
+    policy = scheduling_policies[scheduler];
 }
 
 void OperatingSystem::initialize_kernel() {
@@ -31,8 +42,8 @@ void OperatingSystem::initialize_kernel() {
     pid_counter = 0;
     run_stress_test = false;
 
-    shared_ptr<SchedulingPolicy> policy = (make_shared<FCFS>());
-    scheduler = make_shared<Scheduler>(policy);
+    initialize_scheduler(scheduler_type);
+    scheduler = make_shared<Scheduler>(cpu, policy);
     dispatcher = make_shared<Dispatcher>();
 
 }
@@ -44,7 +55,6 @@ void OperatingSystem::start(){
 
 void OperatingSystem::run() {
     while (running) {
-        // lock_guard<mutex> guard(mtx);
         
         // Handle stress test if enabled
         if (run_stress_test && ticks % batch_process_frequency == 0) {
@@ -55,6 +65,17 @@ void OperatingSystem::run() {
         for (const auto& core : cpu->get_cores()) {
             if (!core->is_available()) {
                 core->execute();
+            }
+        }
+
+        // Preempt if needed
+        if (scheduler_type == "\"rr\"") {
+            for (auto const& core: cpu->get_cores()) {
+                auto process = core->get_process();
+                if (process && (process->get_program_counter() % quantum_cycles) == 0) {
+                    dispatcher->preempt(core);
+                    scheduler->add_process(process);
+                }
             }
         }
 

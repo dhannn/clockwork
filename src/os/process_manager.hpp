@@ -6,8 +6,8 @@
 
 #include "scheduling_policy.hpp"
 #include "process.hpp"
+#include "cpu.hpp"
 
-class Core;
 
 class InvalidCoreProcessException: std::runtime_error {
     public:
@@ -19,13 +19,14 @@ class Scheduler {
     private:
         std::queue<std::shared_ptr<Process>> ready_queue;
         std::shared_ptr<SchedulingPolicy> policy;
+        std::shared_ptr<CPU> cpu;
         std::set<std::shared_ptr<Process>> done;
 
         void finish_process(std::shared_ptr<Process>);
         std::mutex mtx;
     
     public:
-        Scheduler(std::shared_ptr<SchedulingPolicy> p): policy(p) {
+        Scheduler(std::shared_ptr<CPU> c, std::shared_ptr<SchedulingPolicy> p): cpu(c), policy(p) {
         };
 
         void add_process(std::shared_ptr<Process>);

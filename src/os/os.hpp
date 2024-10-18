@@ -11,6 +11,7 @@
 #include <random>
 
 #include "../config/config.hpp"
+#include "scheduling_policy.hpp"
 #include "cpu.hpp"
 
 using namespace std;
@@ -33,6 +34,10 @@ class OperatingSystem {
         int min_ins;
         int delay_per_exec;
         int ticks = 0;
+        int quantum_cycles;
+        string scheduler_type;
+
+        shared_ptr<SchedulingPolicy> policy;
 
         random_device rd;
         mt19937 gen;
@@ -43,8 +48,9 @@ class OperatingSystem {
         static atomic<bool> run_stress_test;
         atomic<bool> running;
         thread main_thread;
-        void run();
         set<shared_ptr<Process>> finished;
+        void run();
+        void initialize_scheduler(string scheduler);
 
     public:
         OperatingSystem(): running(false), gen(rd()) {};
