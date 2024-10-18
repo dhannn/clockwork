@@ -42,6 +42,7 @@ class CPU {
         int tick() { return tick_num++; };
         std::vector<std::shared_ptr<Core>> get_cores() { return cores; };
         void initialize_cores(int);
+        void do_work();
         std::shared_ptr<Core> get_available_core() const;
         int get_num_available_cores() const;
         int get_num_cores() const { return cores.size(); };

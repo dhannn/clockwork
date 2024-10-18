@@ -43,8 +43,8 @@ void OperatingSystem::initialize_kernel() {
     run_stress_test = false;
 
     initialize_scheduler(scheduler_type);
-    scheduler = make_shared<Scheduler>(cpu, policy);
     dispatcher = make_shared<Dispatcher>();
+    scheduler = make_shared<Scheduler>(cpu, policy, dispatcher);
 
 }
 
@@ -62,33 +62,9 @@ void OperatingSystem::run() {
         }
 
         // First, execute all currently running processes
-        for (const auto& core : cpu->get_cores()) {
-            if (!core->is_available()) {
-                core->execute();
-            }
-        }
-
-        // Preempt if needed
-        if (scheduler_type == "\"rr\"") {
-            for (auto const& core: cpu->get_cores()) {
-                auto process = core->get_process();
-                if (process && (process->get_program_counter() % quantum_cycles) == 0) {
-                    dispatcher->preempt(core);
-                    scheduler->add_process(process);
-                }
-            }
-        }
-
-        // Then, assign new processes to available cores
-        while (auto available_core = cpu->get_available_core()) {
-            auto next_process = scheduler->next();
-            if (!next_process) {
-                break;  // No more processes to assign
-            }
-            
-            dispatcher->dispatch(available_core, next_process);
-        }
-
+        cpu->do_work();
+        scheduler->schedule();
+        
         ticks = cpu->tick();
         this_thread::sleep_for(chrono::milliseconds(delay_per_exec));
     }
@@ -101,7 +77,7 @@ void OperatingSystem::shutdown() {
     if (main_thread.joinable()) {
         main_thread.join();
     }
-
+    
 }
 
 void OperatingSystem::start_stress_test() {

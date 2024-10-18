@@ -50,6 +50,16 @@ void CPU::initialize_cores(int num_cores) {
 
 }
 
+void CPU::do_work() {
+
+    for (const auto& core : cores) {
+        if (!core->is_available()) {
+            core->execute();
+        }
+    }
+    
+}
+
 int CPU::get_num_available_cores() const {
     
     int num = 0;

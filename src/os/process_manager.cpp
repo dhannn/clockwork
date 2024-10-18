@@ -13,6 +13,20 @@ void Scheduler::add_process(shared_ptr<Process> process) {
     ready_queue.push(process);
 }
 
+void Scheduler::schedule() {
+    policy->preempt(cpu, ready_queue, dispatcher);
+
+    while (auto available_core = cpu->get_available_core()) {
+        auto next_process = policy->next(cpu, ready_queue);
+        
+        if (!next_process) {
+            break;  // No more processes to assign
+        }
+        
+        dispatcher->dispatch(available_core, next_process);
+    }
+}
+
 shared_ptr<Process> Scheduler::next() {
     return policy->next(cpu, ready_queue);
 }

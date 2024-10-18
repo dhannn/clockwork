@@ -2,6 +2,7 @@
 #include <queue>
 #include <iostream>
 #include "scheduling_policy.hpp"
+#include "process_manager.hpp"
 #include "process.hpp"
 
 using namespace std;
@@ -24,22 +25,17 @@ RoundRobinPolicy::RoundRobinPolicy(int quantum_slice) {
     this->quantum_slice = quantum_slice;
 }
 
-void RoundRobinPolicy::preempt(shared_ptr<CPU> cpu, queue<shared_ptr<Process>>& ready_queue) {
-
+void RoundRobinPolicy::preempt(shared_ptr<CPU> cpu, queue<shared_ptr<Process>>& ready_queue, std::shared_ptr<Dispatcher> dispatcher) {    
+    
     auto cores = cpu->get_cores();
-    for (auto const& core: cores) {
+    for (auto const& core : cores) {
+
         auto process = core->get_process();
-
-        if (process == nullptr) {
-            continue;
-        }
-
-        if ((process->get_program_counter() % quantum_slice) == 0) {
-            process->preempt();
-            core->release();
-
+        if (process && (process->get_program_counter() % quantum_slice) == 0) {
+            dispatcher->preempt(core);
             ready_queue.push(process);
         }
+
     }
 
 }
