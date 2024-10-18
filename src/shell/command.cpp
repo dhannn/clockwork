@@ -25,7 +25,13 @@ void InitializeCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
     os.start();
 }
 
-void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {  
+
+    if (!os.is_running()) {
+        shell.display_error("OS must be bootstrapped. Use initialize command.");
+        return;
+    }
+
     auto const& opt = args[0];
 
     if (opt == "-S") {
@@ -110,6 +116,12 @@ void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const std::vector
 }
 
 void ProcessSMICommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args)  {
+    
+    if (!os.is_running()) {
+        shell.display_error("OS must be bootstrapped. Use initialize command.");
+        return;
+    }
+
     if (shell.state != SCREEN_SINGLE) {
         shell.display_error("Command process-smi cannot be accessed. Please choose a process via screen [-s <process-name> | -r <process-name>] ");
         return;
@@ -126,11 +138,23 @@ void ProcessSMICommand::execute(Shell& shell, OperatingSystem& os, const std::ve
 }
 
 void SchedulerTestCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+    
+    if (!os.is_running()) {
+        shell.display_error("OS must be bootstrapped. Use initialize command.");
+        return;
+    }
+
     shell.display("Spawning process every " + to_string(os.get_batch_frequency()) + " ticks...");
     os.start_stress_test();
 }
 
 void SchedulerStopCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+
+    if (!os.is_running()) {
+        shell.display_error("OS must be bootstrapped. Use initialize command.");
+        return;
+    }
+
     shell.display("Stopping stress test...");
     os.stop_stress_test();
 }
@@ -143,6 +167,11 @@ struct PCB {
 };
 
 void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+
+    if (!os.is_running()) {
+        shell.display_error("OS must be bootstrapped. Use initialize command.");
+        return;
+    }
 
     vector<string> name;
     vector<string> time_created;
@@ -234,6 +263,7 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
 }
 
 void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
+
     if (shell.state == SCREEN_SINGLE || shell.state == SCREEN_MULTIPLE) {
         shell.state = MAIN_MENU;
         shell.start();
@@ -242,7 +272,7 @@ void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<s
 
     shell.display("Shutting down OS...");
     cout << "    ";
-    this_thread::sleep_for(chrono::milliseconds(1000));
+    this_thread::sleep_for(chrono::milliseconds(500));
     os.shutdown();
     shell.stop();
 }

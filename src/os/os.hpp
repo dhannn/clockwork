@@ -59,6 +59,8 @@ class OperatingSystem {
         void start();
         void shutdown();
 
+        bool is_running() { return running; };
+
         void spawn_process(const string&);
         void start_stress_test();
         void stop_stress_test();

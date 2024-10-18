@@ -106,9 +106,10 @@ void Shell::display_process(const std::string& name, int id, int current_line, i
         COLOR(RESET_COLOR, RESET_COLOR);
         cout << "    Lines of code: " << max_lines << endl;
     } else {
+        cout << "    ";
         COLOR(GREEN_FG, GREEN_BG);
         FMT(BOLD);
-        cout << "    Finished!";
+        cout <<"Finished!";
         FMT(0);
         cout << endl;
     }
