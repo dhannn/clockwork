@@ -240,6 +240,8 @@ void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<s
         return;
     }
 
+    shell.display("Shutting down OS");
+    this_thread::sleep_for(chrono::milliseconds(1000));
     os.shutdown();
     shell.stop();
 }
