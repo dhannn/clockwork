@@ -182,7 +182,8 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
     file << endl << "CPU utilization: " << ((os.get_num_cores() - os.get_available_cores() * 1.0) / os.get_num_cores()) * 100 << "%" << endl;
     file << "Cores Used: " << os.get_num_cores() - os.get_available_cores() << endl;
     file << "Cores Available: " << os.get_available_cores() << endl;
-    file << endl << "Running processes:" << endl;
+    cout << endl << "--------------------------------------------------------------------------------" << endl;
+    cout << "Running processes:" << endl;
     
     for (int i = 0; i < name.size(); i++) {
 
@@ -228,8 +229,8 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const std::ve
 
         file << buff;
     }
-    
-    file << endl;
+
+    cout << endl << "--------------------------------------------------------------------------------" << endl;
 }
 
 void ExitCommand::execute(Shell& shell, OperatingSystem& os, const std::vector<std::string>& args) {
