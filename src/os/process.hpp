@@ -24,14 +24,14 @@ class Process {
     private:
         int pid;
         std::string name;
-        int program_counter;
-        int num_instructions;
+        long long int program_counter;
+        long long int num_instructions;
         ProcessState state;
         std::time_t created_at;
 
     public:
         Process() {};
-        Process(const int id, const std::string& n, const int num_ins):
+        Process(const int id, const std::string& n, const long long int num_ins):
             pid(id),
             name(n),
             program_counter(0),
@@ -43,8 +43,8 @@ class Process {
         int get_id() { return pid; };
         ProcessState get_state() { return state; }
         std::string get_name() { return name; };
-        int get_program_counter() { return program_counter; };
-        int get_num_instruction() { return num_instructions; };
+        long long int get_program_counter() { return program_counter; };
+        long long int get_num_instruction() { return num_instructions; };
         std::string get_created_at() { 
             struct tm* timeinfo = std::localtime(&created_at);
             char buffer[50];

@@ -30,3 +30,4 @@ The new Windows Terminal supports ANSI escape code without adjustments.
 ### Build
 1. Run `make-mingw64` to build the executable.
 1. Enter `.\cw` to run the program.
+1. To recompile, run `make-mingw64 clean` and `make-mingw64`.

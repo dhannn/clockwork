@@ -14,12 +14,12 @@ void OperatingSystem::bootstrap(shared_ptr<Config> c) {
 
     config = c;
     num_cores = stoi(config->get("num-cpu"));
-    batch_process_frequency = stoi(config->get("batch-process-freq"));
-    max_ins = stoi(config->get("max-ins"));
-    min_ins = stoi(config->get("min-ins"));
-    delay_per_exec = stoi(config->get("delay-per-exec"));
+    batch_process_frequency = stoll(config->get("batch-process-freq"));
+    max_ins = stoll(config->get("max-ins"));
+    min_ins = stoll(config->get("min-ins"));
+    delay_per_exec = stoll(config->get("delay-per-exec"));
     scheduler_type = config->get("scheduler");
-    quantum_cycles = stoi(config->get("quantum-cycles"));
+    quantum_cycles = stoll(config->get("quantum-cycles"));
 
     initialize_kernel();
 
@@ -37,7 +37,7 @@ void OperatingSystem::initialize_kernel() {
 
     cpu = make_shared<CPU>();
     cpu->initialize_cores(num_cores);
-    dist = uniform_int_distribution<>(min_ins, max_ins);
+    dist = uniform_int_distribution<long long>(min_ins, max_ins);
 
     pid_counter = 0;
     run_stress_test = false;
@@ -103,7 +103,7 @@ void OperatingSystem::spawn_process(const string& name) {
     
     pid_counter++;
 
-    int instruction_count = dist(gen);
+    long long int instruction_count = dist(gen);
     shared_ptr<Process> process = make_shared<Process>(pid_counter, name, instruction_count);
     process_table[name] = process;
     scheduler->add_process(process);

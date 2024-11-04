@@ -29,19 +29,19 @@ class OperatingSystem {
         map<string, shared_ptr<Process>> process_table;
         
         int num_cores;
-        int batch_process_frequency;
-        int max_ins;
-        int min_ins;
-        int delay_per_exec;
-        int ticks = 0;
-        int quantum_cycles;
+        long long int batch_process_frequency;
+        long long int max_ins;
+        long long int min_ins;
+        long long int delay_per_exec;
+        long long int ticks = 0;
+        long long int quantum_cycles;
         string scheduler_type;
 
         shared_ptr<SchedulingPolicy> policy;
 
         random_device rd;
         mt19937 gen;
-        uniform_int_distribution<> dist;
+        uniform_int_distribution<long long> dist;
 
         mutex mtx;
         static atomic<int> pid_counter;

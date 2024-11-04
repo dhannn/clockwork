@@ -49,15 +49,15 @@ class Shell {
         bool is_running() { return __is_running; };
         std::pair<std::string, std::vector<std::string>> accept();
         void display(const std::string& message);
-        void display_process(const std::string& name, int id, int current_line, int max_lines);
+        void display_process(const std::string& name, int id, long long int current_line, long long int max_lines);
         void display_processes(
             int used_cores,
             int num_cores,
             std::vector<string> name, 
             std::vector<string> time_created,
             std::vector<int> core_id,
-            std::vector<int> num_ins, 
-            std::vector<int> max_ins);
+            std::vector<long long int> num_ins, 
+            std::vector<long long int> max_ins);
         void display_error(const std::string& error);
         void clear_screen();
         void stop();

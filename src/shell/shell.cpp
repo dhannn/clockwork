@@ -74,7 +74,7 @@ void Shell::display(const std::string& message) {
 }
 
 
-void Shell::display_process(const std::string& name, int id, int current_line, int max_lines) {
+void Shell::display_process(const std::string& name, int id, long long int current_line, long long int max_lines) {
     cout << "    "; 
     COLOR(YELLOW_BG, WHITE_FG);
     cout << "Process";
@@ -118,8 +118,8 @@ void Shell::display_process(const std::string& name, int id, int current_line, i
 struct PCB {
     string name;
     string time_created;
-    int num_ins;
-    int max_ins;
+    long long int num_ins;
+    long long int max_ins;
 };
 
 void Shell::display_processes(
@@ -128,8 +128,8 @@ void Shell::display_processes(
     vector<string> name, 
     vector<string> time_created,
     vector<int> core_id,
-    vector<int> num_ins, 
-    vector<int> max_ins) {
+    vector<long long int> num_ins, 
+    vector<long long int> max_ins) {
         vector<struct PCB> finished;
     
     cout << endl << "    CPU utilization: " << ((used_cores * 1.0) / num_cores) * 100 << "%" << endl;
@@ -148,7 +148,7 @@ void Shell::display_processes(
                 _n = _n.substr(0, 12).append("...");
             }
 
-            printf("    %-15s  (%s)  Core: %d  %8d / %-8d\n", 
+            printf("    %-15s  (%s)  Core: %d  %11lld / %-11lld\n", 
                 _n.c_str(), time_created[i].c_str(), core_id[i], num_ins[i], max_ins[i]);
         } else {
             struct PCB pcb {
@@ -170,7 +170,7 @@ void Shell::display_processes(
         if (_n.length() > 15) {
             _n = _n.substr(0, 12).append("...");
         }
-            printf("    %-15s (%s)  Finished  %8d / %-8d\n", 
+            printf("    %-15s (%s)  Finished  %11ld / %-11lld\n", 
                 _n.c_str(), pcb.time_created.c_str(), pcb.num_ins, pcb.max_ins);
     }
 

@@ -19,6 +19,11 @@ void ClearCommand::execute(Shell& shell, OperatingSystem& os, const vector<strin
 void InitializeCommand::execute(Shell& shell, OperatingSystem& os, const vector<string>& args) {
     ConfigParser parser("config.txt");
     auto config = parser.parse();
+
+    if (os.is_running()) {
+        os.shutdown();
+    }
+
     shell.display("Bootstrapping OS...");
     os.bootstrap(config);
     shell.display("Starting machine...");
@@ -73,8 +78,8 @@ void ScreenCommand::execute(Shell& shell, OperatingSystem& os, const vector<stri
         vector<string> name;
         vector<string> time_created;
         vector<int> core_id;
-        vector<int> num_ins;
-        vector<int> max_ins;
+        vector<long long int> num_ins;
+        vector<long long int> max_ins;
 
         auto running = os.get_running_processes();
         for (int i = 0; i < os.get_num_cores(); i++) {
@@ -162,8 +167,8 @@ void SchedulerStopCommand::execute(Shell& shell, OperatingSystem& os, const vect
 struct PCB {
     string name;
     string time_created;
-    int num_ins;
-    int max_ins;
+    long long int num_ins;
+    long long int max_ins;
 };
 
 void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const vector<string>& args) {
@@ -176,11 +181,11 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const vector<
     vector<string> name;
     vector<string> time_created;
     vector<int> core_id;
-    vector<int> num_ins;
-    vector<int> max_ins;
+    vector<long long int> num_ins;
+    vector<long long int> max_ins;
 
-    ofstream file("clockwork-log.txt");
-    shell.display("Saving to clockwork-log.txt");
+    ofstream file("csopesy-log.txt");
+    shell.display("Saving to csopesy-log.txt");
 
     auto running = os.get_running_processes();
     for (int i = 0; i < os.get_num_cores(); i++) {
@@ -225,7 +230,7 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const vector<
                     _n = _n.substr(0, 12).append("...");
                 }
 
-                sprintf(buff, "%-15s  (%s)  Core: %d  %8d / %-8d\n", 
+                sprintf(buff, "%-15s  (%s)  Core: %d  %11lld / %-11lld\n", 
                     _n.c_str(), time_created[i].c_str(), core_id[i], num_ins[i], max_ins[i]);
 
                 file << buff;
@@ -253,7 +258,7 @@ void ReportUtilCommand::execute(Shell& shell, OperatingSystem& os, const vector<
 
         char buff[100] = "";
 
-        sprintf(buff, "%-15s (%s)  Finished  %8d / %-8d\n", 
+        sprintf(buff, "%-15s (%s)  Finished  %11lld / %-11lld\n", 
             _n.c_str(), pcb.time_created.c_str(), pcb.num_ins, pcb.max_ins);
 
         file << buff;
